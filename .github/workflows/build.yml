@@ -13,6 +13,11 @@ jobs:
         with:
           submodules: recursive
 
+      - name: rename product
+        run: |
+          sed -i 's/"Pico Key",/"Pico2Key",/' pico-keys-sdk/src/usb/usb_descriptors.c
+          grep -n '"Pico2Key"' pico-keys-sdk/src/usb/usb_descriptors.c
+
       - name: install tools
         run: |
           sudo apt-get update
