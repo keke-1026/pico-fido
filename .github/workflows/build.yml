@@ -1,0 +1,35 @@
+name: build-pico2
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: install tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build gcc-arm-none-eabi libnewlib-arm-none-eabi libstdc++-arm-none-eabi-newlib build-essential pkg-config libusb-1.0-0-dev python3
+
+      - name: get pico-sdk
+        run: |
+          git clone --depth 1 --branch 2.1.1 --recurse-submodules --shallow-submodules https://github.com/raspberrypi/pico-sdk.git $HOME/pico-sdk
+
+      - name: build
+        run: |
+          mkdir build
+          cd build
+          cmake .. -G Ninja -DPICO_BOARD=pico2 -DPICO_SDK_PATH=$HOME/pico-sdk
+          ninja
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pico_fido_pico2
+          path: build/*.uf2
